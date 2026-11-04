@@ -1,11 +1,273 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>EcoTrade - บริการนัดหมายรถรับขยะ</title>
+    <link rel="preconnect" href="https://googleapis.com">
+    <link rel="preconnect" href="https://gstatic.com" crossorigin>
+    <link href="https://googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* --- 1. สไตล์พื้นฐาน (Global Styles) --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Prompt', sans-serif;
+        }
+        body {
+            background-color: #F8F9FA;
+            color: #1A202C;
+            line-height: 1.6;
+        }
+        /* --- 2. แถบเมนูด้านบน (Header & Navigation) --- */
+        header {
+            background-color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2D6A4F;
+            text-decoration: none;
+        }
+        .logo span {
+            color: #52B788;
+        }
+        nav a {
+            color: #4A5568;
+            text-decoration: none;
+            margin-left: 20px;
+            font-weight: 600;
+            transition: color 0.3s;
+        }
+        nav a:hover, nav a.active {
+            color: #2D6A4F;
+        }
+        /* --- 3. ส่วนเนื้อหาฟอร์มนัดหมาย (Booking Form Section) --- */
+        .booking-section {
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+        .form-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-top: 6px solid #2D6A4F; /* เน้นสีหลักที่ขอบบน */
+        }
+        h1 {
+            color: #2D6A4F;
+            font-size: 28px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .subtitle {
+            color: #718096;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        /* การจัดกลุ่มองค์ประกอบในฟอร์ม */
+        .form-group {
+            margin-bottom: 25px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            color: #2D6A4F;
+            margin-bottom: 8px;
+        }
+        /* กล่องอินพุตและตัวเลือกต่างๆ */
+        input[type="text"],
+        input[type="date"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #E2E8F0;
+            border-radius: 8px;
+            font-size: 16px;
+            color: #1A202C;
+            transition: all 0.3s ease;
+            background-color: #FAFAFA;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #52B788; /* เปลี่ยนเป็นสีเขียวมินต์เมื่อคลิก */
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(82, 183, 136, 0.15);
+        }
+        /* ส่วนเลือกประเภทขยะรีไซเคิล (Checkbox Grid) */
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 5px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            background-color: #F8F9FA;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 1px solid #E2E8F0;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .checkbox-item:hover {
+            border-color: #52B788;
+            background-color: #F0FDF4;
+        }
+        .checkbox-item input {
+            margin-right: 12px;
+            width: 18px;
+            height: 18px;
+            accent-color: #2D6A4F;
+        }
+        /* ส่วนข้อมูลวันและเวลาแบบสองคอลัมน์ */
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        /* สไตล์ปุ่มส่งข้อมูล (Submit Button) */
+        .btn-submit {
+            width: 100%;
+            background-color: #2D6A4F;
+            color: #ffffff;
+            padding: 14px;
+            font-size: 18px;
+            font-weight: 700;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(45, 106, 79, 0.2);
+            margin-top: 10px;
+        }
+        .btn-submit:hover {
+            background-color: #1B4332;
+            transform: translateY(-2px);
+        }
+        /* --- 4. การรองรับหน้าจอมือถือ (Responsive Design) --- */
+        @media (max-width: 600px) {
+            .nav-container {
+                flex-direction: column;
+                gap: 15px;
+            }
+            nav a {
+                margin: 0 10px;
+            }
+            .form-container {
+                padding: 20px;
+            }
+            .checkbox-grid, .form-row {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+    </style>
 </head>
 <body>
-    
+    <!-- แถบเมนูหลัก -->
+    <header>
+        <div class="nav-container">
+            <a href="index.html" class="logo">Eco<span>Trade</span></a>
+            <nav>
+                <a href="index.html">หน้าแรก</a>
+                <a href="#" class="active">นัดหมายรถรับขยะ</a>
+                <a href="#">แลกของรางวัล</a>
+                <a href="#">สถิติของฉัน</a>
+            </nav>
+        </div>
+    </header>
+    <!-- ส่วนฟอร์มนัดหมาย -->
+    <section class="booking-section">
+        <div class="form-container">
+            <h1>นัดหมายรถรับขยะรีไซเคิล</h1>
+            <p class="subtitle">กรอกรายละเอียดข้อมูลขยะและที่อยู่ เพื่อให้เครือข่ายรถเคลื่อนที่เข้าตรวจรับ</p>
+
+            <form action="#" method="POST" onsubmit="alert('บันทึกข้อมูลการนัดหมายสำเร็จ! เจ้าหน้าที่จะติดต่อกลับเพื่อยืนยันเวลาอีกครั้ง'); return false;">
+                
+                <!-- 1. ประเภทขยะรีไซเคิล -->
+                <div class="form-group">
+                    <label>ประเภทขยะที่ต้องการส่งมอบ (เลือกได้มากกว่า 1 ข้อ)</label>
+                    <div class="checkbox-grid">
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="waste_type" value="plastic">
+                            <span>ขวดพลาสติก / กล่องพลาสติก</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="waste_type" value="paper">
+                            <span>กระดาษลัง / หนังสือพิมพ์</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="waste_type" value="glass">
+                            <span>ขวดแก้ว / เศษกระจก</span>
+                        </label>
+                        <label class="checkbox-item">
+                            <input type="checkbox" name="waste_type" value="metal">
+                            <span>โลหะ / อลูมิเนียม / กระป๋อง</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 2. ปริมาณโดยประมาณ -->
+                <div class="form-group">
+                    <label for="weight">ปริมาณขยะโดยประมาณ (กิโลกรัม)</label>
+                    <select id="weight" name="weight" required>
+                        <option value="" disabled selected>--- เลือกน้ำหนักโดยประมาณ ---</option>
+                        <option value="less_than_5">น้อยกว่า 5 กิโลกรัม</option>
+                        <option value="5_10">5 - 10 กิโลกรัม</option>
+                        <option value="11_20">11 - 20 กิโลกรัม</option>
+                        <option value="more_than_20">มากกว่า 20 กิโลกรัมขึ้นไป</option>
+                    </select>
+                </div>
+
+                <!-- 3. วันและเวลาที่สะดวก -->
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="date">วันที่สะดวกให้นัดรับ</label>
+                        <input type="date" id="date" name="date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="time">ช่วงเวลาที่สะดวก</label>
+                        <select id="time" name="time" required>
+                            <option value="" disabled selected>--- เลือกช่วงเวลา ---</option>
+                            <option value="morning">ช่วงเช้า (09:00 - 12:00 น.)</option>
+                            <option value="afternoon">ช่วงบ่าย (13:00 - 16:00 น.)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- 4. ข้อมูลสถานที่ติดต่อและปักหมุด -->
+                <div class="form-group">
+                    <label for="address">ที่อยู่และจุดสังเกตสำหรับการเดินทางรับขยะ</label>
+                    <textarea id="address" name="address" rows="3" placeholder="ระบุเลขที่บ้าน อาคาร ชั้น ซอย หรือชื่อคอนโด เพื่อความสะดวกของคนขับรถ..." required></textarea>
+                </div>
+
+                <!-- 5. เบอร์โทรศัพท์ติดต่อ -->
+                <div class="form-group">
+                    <label for="phone">เบอร์โทรศัพท์สำหรับติดต่อหน้างาน</label>
+                    <input type="text" id="phone" name="phone" placeholder="เช่น 0812345678" required>
+                </div>
+
+                <!-- ปุ่มยืนยันข้อมูล -->
+                <button type="submit" class="btn-submit">ยืนยันข้อมูลและส่งนัดหมาย</button>
+
+            </form>
+        </div>
+    </section>
+
 </body>
 </html>
